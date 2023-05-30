@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".services.RegisterActivity">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:padding="16dp"
+        android:background="@drawable/background_gradient"
+        tools:context=".Services.RegisterActivity">
+
+        <EditText
+            android:id="@+id/editTextEmail"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="30dp"
+            android:hint="Correo electrónico"
+            android:inputType="textEmailAddress"
+            android:background="@drawable/aditional"
+            android:textColor="#000000"
+            android:textColorHint="#B3575656"
+            android:textSize="16sp"
+            android:padding="12dp"
+            android:drawableStart="@drawable/ic_email"
+            android:drawablePadding="8dp" />
+
+
+        <EditText
+            android:id="@+id/editTextPassword"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:hint="Contraseña"
+            android:inputType="textPassword"
+            android:background="@drawable/aditional"
+            android:textColor="#000000"
+            android:textColorHint="#B3575656"
+            android:textSize="16sp"
+            android:padding="12dp"
+            android:drawableStart="@drawable/ic_password"
+            android:drawablePadding="8dp" />
+
+        <EditText
+            android:id="@+id/editTextName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:hint="Nombre"
+            android:background="@drawable/aditional"
+            android:textColor="#000000"
+            android:textColorHint="#B3575656"
+            android:textSize="16sp"
+            android:padding="12dp"
+            android:drawableStart="@drawable/ic_user"
+            android:drawablePadding="8dp" />
+
+        <Button
+            android:id="@+id/btnRegister"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:text="Registrar"
+            android:background="@drawable/button_background" />
+
+        <Button
+            android:id="@+id/btnCancel"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="Cancelar"
+            android:background="@drawable/button_background" />
+
+    </LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>
