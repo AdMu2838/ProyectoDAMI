@@ -21,9 +21,9 @@ class HomeFragment : Fragment() {
         val view = inflater.inflate(R.layout.fragment_home, container, false)
         categoryGridView = view.findViewById(R.id.gridView_categories)
         val categories: MutableList<Categoria> = ArrayList()
-        categories.add(Categoria("Categoría 1", R.drawable.ic_logo))
-        categories.add(Categoria("Categoría 2", R.drawable.ic_logo))
-        categories.add(Categoria("Categoría 3", R.drawable.ic_logo))
+        categories.add(Categoria("Categoría 1", R.drawable.categoria1_image))
+        categories.add(Categoria("Categoría 2", R.drawable.categoria2_image))
+        categories.add(Categoria("Categoría 3", R.drawable.categoria3_image))
 
         categoryAdapter = CategoryAdapter(requireContext(), categories)
 

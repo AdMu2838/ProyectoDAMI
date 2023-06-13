@@ -23,6 +23,5 @@ class MainActivity : AppCompatActivity() {
         AppBarConfiguration(navController.graph)
         navView.setupWithNavController(navController)
 
-
     }
 }
