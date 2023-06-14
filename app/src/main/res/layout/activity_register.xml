@@ -14,11 +14,32 @@
         android:background="@drawable/background_gradient"
         tools:context=".Services.RegisterActivity">
 
+        <ImageView
+            android:layout_width="120dp"
+            android:layout_height="120dp"
+            android:layout_gravity="center_horizontal"
+            android:src="@drawable/ic_logo"
+            />
+
+        <EditText
+            android:id="@+id/editTextName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:hint="Nombre"
+            android:background="@drawable/aditional"
+            android:textColor="#000000"
+            android:textColorHint="#B3575656"
+            android:textSize="16sp"
+            android:padding="12dp"
+            android:drawableStart="@drawable/ic_user"
+            android:drawablePadding="8dp" />
+
         <EditText
             android:id="@+id/editTextEmail"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="30dp"
+            android:layout_marginTop="16dp"
             android:hint="Correo electrónico"
             android:inputType="textEmailAddress"
             android:background="@drawable/aditional"
@@ -44,21 +65,46 @@
             android:drawableStart="@drawable/ic_password"
             android:drawablePadding="8dp" />
 
-        <EditText
-            android:id="@+id/editTextName"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
-            android:hint="Nombre"
+            android:orientation="horizontal">
+
+            <EditText
+                android:id="@+id/editTextDate"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginTop="16dp"
+                android:hint="Fecha de nacimiento"
+                android:inputType="date"
+                android:background="@drawable/aditional"
+                android:textColor="#000000"
+                android:textColorHint="#B3575656"
+                android:textSize="16sp"
+                android:padding="12dp"
+                android:drawableStart="@drawable/ic_calendar"
+                android:drawablePadding="8dp"
+                android:focusableInTouchMode="false"/>
+
+        </LinearLayout>
+
+
+        <EditText
+            android:id="@+id/editTextPhoneNumber"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:hint="Número de celular"
+            android:inputType="phone"
             android:background="@drawable/aditional"
             android:textColor="#000000"
             android:textColorHint="#B3575656"
             android:textSize="16sp"
             android:padding="12dp"
-            android:drawableStart="@drawable/ic_user"
+            android:drawableStart="@drawable/ic_phone"
             android:drawablePadding="8dp" />
-
-
 
         <Button
             android:id="@+id/btnRegister"
