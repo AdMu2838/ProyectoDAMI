@@ -85,7 +85,26 @@ class RegisterActivity : AppCompatActivity() {
                     // El registro fue exitoso, el usuario está autenticado
                     val user = FirebaseAuth.getInstance().currentUser
 
-                    // Realizar cualquier acción adicional necesaria (por ejemplo, guardar datos adicionales del usuario en Firestore)
+                    // Guardar los datos del usuario en Firestore
+                    val db = FirebaseFirestore.getInstance()
+                    val userMap = hashMapOf(
+                        "name" to name,
+                        "email" to email,
+                        "date" to date,
+                        "phoneNumber" to phoneNumber
+                    )
+                    val uid = user?.uid
+
+                    if (uid != null) {
+                        db.collection("users").document(uid)
+                            .set(userMap)
+                            .addOnSuccessListener {
+                                // Datos guardados exitosamente en Firestore
+                            }
+                            .addOnFailureListener { e ->
+                                // Ocurrió un error al guardar los datos en Firestore
+                            }
+                    }
 
                     Toast.makeText(this, "Registro exitoso", Toast.LENGTH_SHORT).show()
 
