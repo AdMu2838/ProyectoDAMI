@@ -21,4 +21,25 @@
 
     <!--colros for card-->
     <color name="whiteCardColor">#fff</color>
+    <!-- Colores principales -->
+    <color name="primary_color">#2196F3</color>
+    <color name="primary_dark_color">#1976D2</color>
+    <color name="accent_color">#FF4081</color>
+
+    <!-- Colores de texto -->
+    <color name="text_primary">#212121</color>
+    <color name="text_secondary">#757575</color>
+    <color name="text_disabled">#BDBDBD</color>
+
+    <!-- Colores de fondo -->
+    <color name="background_light">#FFFFFF</color>
+    <color name="background_dark">#F5F5F5</color>
+
+    <!-- Otros colores -->
+    <color name="divider_color">#BDBDBD</color>
+    <color name="success_color">#4CAF50</color>
+    <color name="error_color">#F44336</color>
+    <color name="warning_color">#FFC107</color>
+    <color name="black">#000000</color>
+    <color name="dark_gray">#A9A9A9</color>
 </resources>
