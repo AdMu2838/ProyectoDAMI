@@ -1,36 +1,51 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:padding="16dp">
 
+    <ImageView
+        android:layout_width="120dp"
+        android:layout_height="120dp"
+        android:src="@drawable/profile_picture_placeholder"
+        android:scaleType="centerCrop"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginBottom="16dp" />
+
     <TextView
         android:id="@+id/nameTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Nombre"
-        />
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:text="Nombre de Usuario"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginBottom="8dp" />
 
     <TextView
         android:id="@+id/emailTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Correo electrónico"
-        />
+        android:textSize="16sp"
+        android:text="Correo Electrónico"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginBottom="8dp" />
 
     <TextView
         android:id="@+id/dateTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Fecha de nacimiento"
-        />
+        android:textSize="16sp"
+        android:text="Fecha de Nacimiento"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginBottom="8dp" />
 
     <TextView
         android:id="@+id/phoneNumberTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Número de celular"
-        />
+        android:textSize="16sp"
+        android:text="Número de Teléfono"
+        android:layout_gravity="center_horizontal" />
 
 </LinearLayout>
