@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "858416867568",
+    "project_id": "masco-c2da2",
+    "storage_bucket": "masco-c2da2.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:858416867568:android:970c567415f71a6f6b7a35",
+        "android_client_info": {
+          "package_name": "com.example.proyecto"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "858416867568-4a9l6s8dhjgs67rpqj8b9ku91a06k4ol.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBz5Af0RUidCNTlD5Xl8BMFQuYhUb5ZDUc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "858416867568-4a9l6s8dhjgs67rpqj8b9ku91a06k4ol.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

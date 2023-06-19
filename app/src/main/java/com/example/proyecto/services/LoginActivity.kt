@@ -4,11 +4,13 @@ import android.content.Intent
 import android.database.Cursor
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.text.TextUtils
 import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
 import com.example.proyecto.R
 import com.example.proyecto.config.DatabaseHelper
+import com.google.firebase.auth.FirebaseAuth
 
 class LoginActivity : AppCompatActivity() {
     private lateinit var databaseHelper: DatabaseHelper
@@ -27,39 +29,37 @@ class LoginActivity : AppCompatActivity() {
         }
     }
     private fun loginUser() {
-        // Obtener los datos del formulario de inicio de sesión
-        val editTextEmail: EditText = findViewById(R.id.editTextEmail)
-        val editTextPassword: EditText = findViewById(R.id.editTextPassword)
+            val email = findViewById<EditText>(R.id.editTextEmail).text.toString().trim()
+            val password = findViewById<EditText>(R.id.editTextPassword).text.toString().trim()
 
-        val email = editTextEmail.text.toString()
-        val password = editTextPassword.text.toString()
+            // Validar los campos de entrada
+            if (TextUtils.isEmpty(email)) {
+                Toast.makeText(this, "Ingresa tu correo electrónico", Toast.LENGTH_SHORT).show()
+                return
+            }
 
-        // Buscar el usuario en la base de datos
-        val db = databaseHelper.readableDatabase
-        val columns = arrayOf(DatabaseHelper.COLUMN_ID)
-        val selection = "${DatabaseHelper.COLUMN_EMAIL} = ? AND ${DatabaseHelper.COLUMN_PASSWORD} = ?"
-        val selectionArgs = arrayOf(email, password)
-        val cursor: Cursor? = db.query(
-            DatabaseHelper.TABLE_NAME,
-            columns,
-            selection,
-            selectionArgs,
-            null,
-            null,
-            null
-        )
+            if (TextUtils.isEmpty(password)) {
+                Toast.makeText(this, "Ingresa tu contraseña", Toast.LENGTH_SHORT).show()
+                return
+            }
 
-        if (cursor != null && cursor.moveToFirst()) {
-            // El usuario existe y las credenciales son correctas
-            val userId = cursor.getLong(cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_ID))
-            Toast.makeText(this, "Inicio de sesión exitoso. ID de usuario: $userId", Toast.LENGTH_SHORT).show()
-            val intent = Intent(this, MainActivity::class.java)
-            startActivity(intent)
-        } else {
-            // Las credenciales son incorrectas o el usuario no existe
-            Toast.makeText(this, "Credenciales incorrectas. Por favor, intenta nuevamente.", Toast.LENGTH_SHORT).show()
+            // Iniciar sesión con Firebase Authentication
+            FirebaseAuth.getInstance().signInWithEmailAndPassword(email, password)
+                .addOnCompleteListener { task ->
+                    if (task.isSuccessful) {
+                        // El inicio de sesión fue exitoso, el usuario está autenticado
+                        Toast.makeText(this, "Inicio de sesión exitoso", Toast.LENGTH_SHORT).show()
+
+                        val intent = Intent(this, MainActivity::class.java)
+                        startActivity(intent)
+                    } else {
+                        // Ocurrió un error durante el inicio de sesión
+                        Toast.makeText(
+                            this,
+                            "Error al iniciar sesión: ${task.exception?.message}",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+                }
         }
-        cursor?.close()
-    }
-
 }
