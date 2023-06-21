@@ -1,7 +1,6 @@
 package com.example.proyecto.services
 
 import android.content.Intent
-import android.database.Cursor
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.text.TextUtils
@@ -9,15 +8,13 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
 import com.example.proyecto.R
-import com.example.proyecto.config.DatabaseHelper
 import com.google.firebase.auth.FirebaseAuth
 
 class LoginActivity : AppCompatActivity() {
-    private lateinit var databaseHelper: DatabaseHelper
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
-        databaseHelper = DatabaseHelper(this)
+
         // Habilitar la persistencia de la sesión en Firebase Authentication
 
         val btnRegister = findViewById<Button>(R.id.btnRegistro)

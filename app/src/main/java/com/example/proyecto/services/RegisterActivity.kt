@@ -12,7 +12,7 @@ import android.widget.DatePicker
 import android.widget.EditText
 import android.widget.Toast
 import com.example.proyecto.R
-import com.example.proyecto.config.DatabaseHelper
+
 import com.google.firebase.auth.FirebaseAuth
 import java.util.Calendar
 import com.google.firebase.database.FirebaseDatabase
@@ -22,7 +22,6 @@ import com.google.firebase.firestore.FirebaseFirestore
 class RegisterActivity : AppCompatActivity() {
     private lateinit var btnPickDate: EditText
     private lateinit var datePickerDialog: DatePickerDialog
-    private lateinit var databaseHelper: DatabaseHelper
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_register)
@@ -47,8 +46,7 @@ class RegisterActivity : AppCompatActivity() {
         btnCancel.setOnClickListener {
             finish()
         }
-        // Inicializar el DatabaseHelper
-        databaseHelper = DatabaseHelper(this)
+
 
         // ...
 
