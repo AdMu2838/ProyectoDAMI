@@ -8,6 +8,7 @@ import android.view.View
 import android.widget.AdapterView
 import android.widget.GridView
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import com.example.proyecto.R
 import com.example.proyecto.adapters.ProductAdapter
 import com.example.proyecto.core.Product
@@ -63,10 +64,21 @@ class ProductListActivity : AppCompatActivity() {
         productGridView.onItemClickListener =
             AdapterView.OnItemClickListener { _, _, position, _ ->
                 val selectedProduct = products[position]
-                // Realizar la acción deseada al hacer clic en un producto
+                showProductDetails(selectedProduct)
             }
 
         // Ocultar el GridView si no hay productos
         //productGridView.visibility = if (products.isEmpty()) View.GONE else View.VISIBLE
+    }
+    private fun showProductDetails(product: Product) {
+        val dialogBuilder = AlertDialog.Builder(this)
+        dialogBuilder.setTitle("Detalles del producto")
+        dialogBuilder.setMessage("Nombre: ${product.title}\n" +
+                "Precio: ${product.price}\n" +
+                "Descripción: ${product.description}\n"+
+                "Numero de contacto:  ${product.phoneNumber}")
+        dialogBuilder.setPositiveButton("Cerrar", null)
+        val dialog = dialogBuilder.create()
+        dialog.show()
     }
 }

@@ -49,7 +49,7 @@ class ProductAdapter(private val context: Context, private val products: List<Pr
         }
         // Mostrar los datos del producto en los elementos de la vista
         holder.productTitle?.text = product.title
-        holder.productPrice?.text = product.price.toString()
+        holder.productPrice?.text = "S/. "+ product.price.toString()
 
 
 
