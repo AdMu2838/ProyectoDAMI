@@ -1,98 +1,117 @@
 package com.example.proyecto.fragments
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
-import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
-import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.proyecto.R
 import com.example.proyecto.adapters.ChatAdapter
 import com.example.proyecto.core.Chat
-import com.example.proyecto.core.User
+import com.example.proyecto.services.ChatActivity
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.database.DataSnapshot
-import com.google.firebase.database.DatabaseError
-import com.google.firebase.database.DatabaseReference
-import com.google.firebase.database.FirebaseDatabase
-import com.google.firebase.database.ValueEventListener
-import com.google.firebase.firestore.FirebaseFirestore
-
+import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.ktx.Firebase
+import java.util.UUID
 class ChatFragment : Fragment() {
-    private lateinit var chatAdapter: ChatAdapter
-    private lateinit var chatList: MutableList<Chat>
-    private lateinit var recyclerView: RecyclerView
-    private lateinit var searchEditText: EditText
-    private lateinit var searchButton: Button
-    private lateinit var databaseReference: DatabaseReference
+    private var user = ""
+    private val db = Firebase.firestore
+    private lateinit var newChatText: EditText
+    val currentUser = FirebaseAuth.getInstance().currentUser
+    val currentUserEmail = currentUser?.email
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         val view = inflater.inflate(R.layout.fragment_chat, container, false)
 
-        recyclerView = view.findViewById(R.id.recyclerView)
-        searchEditText = view.findViewById(R.id.searchEditText)
-        searchButton = view.findViewById(R.id.searchButton)
+        arguments?.getString("user")?.let { user = it }
 
-        chatList = mutableListOf()
-        chatAdapter = ChatAdapter(chatList)
-
-        recyclerView.apply {
-            layoutManager = LinearLayoutManager(requireContext())
-            adapter = chatAdapter
+        if (user.isNotEmpty()) {
+            initViews(view)
         }
-        searchButton.setOnClickListener {
-            val email = searchEditText.text.toString().trim()
-            if (email.isNotEmpty()) {
-                searchUserByEmail(email)
-            }
-        }
-        databaseReference = FirebaseDatabase.getInstance().reference.child("chats")
 
         return view
     }
-    private fun searchUserByEmail(email: String) {
-        val usersCollection = FirebaseFirestore.getInstance().collection("users")
 
-        usersCollection.whereEqualTo("email", email).get()
-            .addOnSuccessListener { querySnapshot ->
-                if (!querySnapshot.isEmpty) {
-                    val userDocument = querySnapshot.documents[0]
-                    val user = userDocument.toObject(User::class.java)
-                    if (user != null) {
-                        val chatId = generateChatId(user.email) // Generar un identificador de chat único
-                        navigateToChat(chatId, user)
+    private fun initViews(view: View) {
+        val newChatButton: Button = view.findViewById(R.id.newChatButton)
+        val listChatsRecyclerView: RecyclerView = view.findViewById(R.id.listChatsRecyclerView)
+        newChatText = view.findViewById(R.id.newChatText)
+
+        newChatButton.setOnClickListener { newChat() }
+
+        listChatsRecyclerView.layoutManager = LinearLayoutManager(requireContext())
+        listChatsRecyclerView.adapter = ChatAdapter { chat ->
+            chatSelected(chat)
+        }
+
+        val userRef = db.collection("users").document(user)
+
+        userRef.collection("chats")
+            .get()
+            .addOnSuccessListener { chats ->
+                val listChats = chats.toObjects(Chat::class.java)
+                (listChatsRecyclerView.adapter as ChatAdapter).setData(listChats)
+            }
+
+        userRef.collection("chats")
+            .addSnapshotListener { chats, error ->
+                if (error == null) {
+                    chats?.let {
+                        val listChats = it.toObjects(Chat::class.java)
+                        (listChatsRecyclerView.adapter as ChatAdapter).setData(listChats)
                     }
-                } else {
-                    Toast.makeText(requireContext(), "Usuario no encontrado", Toast.LENGTH_SHORT).show()
                 }
             }
-            .addOnFailureListener { exception ->
-                // Manejar errores de Firestore
-            }
     }
-    private fun generateChatId(email: String): String {
-        // Implementa tu lógica para generar un identificador único para el chat
-        // Por ejemplo, puedes concatenar los correos electrónicos de los usuarios y aplicar un hash
-        // En este ejemplo, simplemente se concatenan los correos electrónicos sin hash
-        val currentUser = FirebaseAuth.getInstance().currentUser
-        val currentEmail = currentUser?.email
-        return if (currentEmail != null) {
-            "$currentEmail-$email"
+
+    private fun chatSelected(chat: Chat) {
+        val chatId = chat.id
+        val intent = Intent(requireContext(), ChatActivity::class.java)
+        intent.putExtra("chatId", chatId)
+        intent.putExtra("user", user)
+        startActivity(intent)
+    }
+
+    private fun newChat() {
+        val chatId = UUID.randomUUID().toString()
+        val otherUserEmail = newChatText.text.toString()
+        val currentUserEmail = currentUser?.email
+
+        if (currentUserEmail != null && otherUserEmail.isNotEmpty()) {
+            val users = listOf(currentUserEmail, otherUserEmail)
+
+            val chat = Chat(
+                id = chatId,
+                name = "Chat con $otherUserEmail",
+                users = users as List<String>
+            )
+
+            try {
+                db.collection("chats").document(chatId).set(chat)
+                db.collection("users").document(currentUserEmail).collection("chats").document(chatId)
+                    .set(chat)
+                db.collection("users").document(otherUserEmail).collection("chats").document(chatId)
+                    .set(chat)
+
+                val intent = Intent(requireContext(), ChatActivity::class.java)
+                intent.putExtra("chatId", chatId)
+                intent.putExtra("userEmail", currentUserEmail)
+                startActivity(intent)
+            } catch (e: Exception) {
+                // Mostrar una alerta de que el usuario no ha sido encontrado
+                Toast.makeText(requireContext(), "No se encontró al usuario", Toast.LENGTH_SHORT).show()
+            }
         } else {
-            ""
+            // Mostrar una alerta indicando que falta información
+            Toast.makeText(requireContext(), "Falta información del usuario", Toast.LENGTH_SHORT).show()
         }
     }
-
-    private fun navigateToChat(chatId: String, user: User) {
-
-    }
-
 }

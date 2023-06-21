@@ -1,6 +1,7 @@
 package com.example.proyecto.core
 
 data class Chat(
-    val chatId: String,
-    val user: User
+    var id: String = "",
+    var name: String = "",
+    var users: List<String> = emptyList()
 )

@@ -2,85 +2,78 @@ package com.example.proyecto.services
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.widget.ArrayAdapter
 import android.widget.Button
 import android.widget.EditText
-import android.widget.ListView
+
+
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.example.proyecto.R
-import com.google.firebase.database.ChildEventListener
-import com.google.firebase.database.DataSnapshot
-import com.google.firebase.database.DatabaseError
-import com.google.firebase.database.DatabaseReference
-import com.google.firebase.database.FirebaseDatabase
+import com.example.proyecto.adapters.MessageAdapter
+import com.example.proyecto.core.Message
+import com.google.firebase.firestore.Query
+import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.ktx.Firebase
 
 class ChatActivity : AppCompatActivity() {
-    private lateinit var messageListView: ListView
-    private lateinit var messageEditText: EditText
-    private lateinit var sendButton: Button
 
-    private lateinit var messageAdapter: ArrayAdapter<String>
-    private lateinit var messageList: MutableList<String>
+    private var chatId = ""
+    private var user = ""
 
-    private lateinit var databaseReference: DatabaseReference
+    private var db = Firebase.firestore
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_chat)
 
-        messageListView = findViewById(R.id.messageListView)
-        messageEditText = findViewById(R.id.messageEditText)
-        sendButton = findViewById(R.id.sendButton)
+        intent.getStringExtra("chatId")?.let { chatId = it }
+        intent.getStringExtra("user")?.let { user = it }
 
-        messageList = mutableListOf()
-        messageAdapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, messageList)
-        messageListView.adapter = messageAdapter
-
-        // Obtén la referencia a la base de datos de Firebase Realtime Database
-        databaseReference = FirebaseDatabase.getInstance().reference.child("messages")
-
-        sendButton.setOnClickListener {
-            val messageText = messageEditText.text.toString().trim()
-            if (messageText.isNotEmpty()) {
-                sendMessage(messageText)
-                messageEditText.text.clear()
-            }
+        if(chatId.isNotEmpty() && user.isNotEmpty()) {
+            initViews()
         }
-
-        // Agrega un listener para recibir los nuevos mensajes de la base de datos
-        databaseReference.addChildEventListener(object : ChildEventListener {
-            override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {
-                val message = snapshot.getValue(String::class.java)
-                message?.let {
-                    messageList.add(it)
-                    messageAdapter.notifyDataSetChanged()
-                    // Desplázate al último mensaje agregado
-                    messageListView.smoothScrollToPosition(messageList.size - 1)
-                }
-            }
-
-            override fun onChildChanged(snapshot: DataSnapshot, previousChildName: String?) {
-                TODO("Not yet implemented")
-            }
-
-            override fun onChildRemoved(snapshot: DataSnapshot) {
-                TODO("Not yet implemented")
-            }
-
-            override fun onChildMoved(snapshot: DataSnapshot, previousChildName: String?) {
-                TODO("Not yet implemented")
-            }
-
-            override fun onCancelled(error: DatabaseError) {
-                // Maneja los errores de la base de datos
-            }
-
-            // Implementa los demás métodos de ChildEventListener según sea necesario
-        })
     }
 
-    private fun sendMessage(messageText: String) {
-        // Crea una nueva entrada en la base de datos con el mensaje enviado
-        val messageRef = databaseReference.push()
-        messageRef.setValue(messageText)
+    private fun initViews(){
+        val messagesRecyclerView: RecyclerView = findViewById(R.id.messagesRecylerView)
+        messagesRecyclerView.layoutManager = LinearLayoutManager(this)
+        messagesRecyclerView.adapter = MessageAdapter(user)
+
+        val messageTextField: EditText = findViewById(R.id.messageTextField)
+        val sendMessageButton: Button = findViewById(R.id.sendMessageButton)
+        sendMessageButton.setOnClickListener { sendMessage() }
+
+        val chatRef = db.collection("chats").document(chatId)
+
+        chatRef.collection("messages").orderBy("dob", Query.Direction.ASCENDING)
+            .get()
+            .addOnSuccessListener { messages ->
+                val listMessages = messages.toObjects(Message::class.java)
+                (messagesRecyclerView.adapter as MessageAdapter).setData(listMessages)
+            }
+
+        chatRef.collection("messages").orderBy("dob", Query.Direction.ASCENDING)
+            .addSnapshotListener { messages, error ->
+                if (error == null) {
+                    messages?.let {
+                        val listMessages = it.toObjects(Message::class.java)
+                        (messagesRecyclerView.adapter as MessageAdapter).setData(listMessages)
+                    }
+                }
+            }
+    }
+
+    private fun sendMessage(){
+        val messageTextField: EditText = findViewById(R.id.messageTextField)
+        val message = Message(
+            message = messageTextField.text.toString(),
+            from = user
+        )
+
+        db.collection("chats").document(chatId).collection("messages").document().set(message)
+
+        messageTextField.setText("")
+
+
     }
 }
