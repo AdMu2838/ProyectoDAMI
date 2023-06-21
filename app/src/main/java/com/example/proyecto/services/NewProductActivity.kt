@@ -13,6 +13,7 @@ import android.widget.Spinner
 import android.widget.Toast
 import com.example.proyecto.R
 import com.example.proyecto.core.Product
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.ktx.storage
@@ -36,9 +37,15 @@ class NewProductActivity : AppCompatActivity() {
     // Uri de la imagen seleccionada
     private var imageUri: Uri? = null
 
+    private lateinit var userID: String // ID del usuario actual
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_new_producto)
+        val firebaseAuth = FirebaseAuth.getInstance()
+        val currentUser = firebaseAuth.currentUser
+        // Obtén el ID del usuario actual (puedes obtenerlo desde tu lógica de autenticación)
+        userID = currentUser?.uid.toString()
 
         etTitle = findViewById(R.id.etTitle)
         etPrice = findViewById(R.id.etPrice)
@@ -93,7 +100,14 @@ class NewProductActivity : AppCompatActivity() {
         }
 
         // Crear un objeto Producto con los datos ingresados
-        val product = Product(title, price.toDouble(), phoneNumber, description, selectedCategory, "")
+        val product = Product(
+            title = title,
+            price = price.toDouble(),
+            phoneNumber = phoneNumber,
+            description = description,
+            category = selectedCategory,
+            userId = FirebaseAuth.getInstance().currentUser?.uid ?: ""
+        )
 
         // Obtener una referencia al Storage de Firebase
         val storage = Firebase.storage
