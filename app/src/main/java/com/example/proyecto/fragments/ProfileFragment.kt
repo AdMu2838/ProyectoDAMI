@@ -13,19 +13,23 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.example.proyecto.R
+import com.example.proyecto.services.LoginActivity
 import com.example.proyecto.services.ProductListActivity
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.ktx.Firebase
 
 class ProfileFragment : Fragment() {
 
-    @SuppressLint("MissingInflatedId")
+
+    val auth = FirebaseAuth.getInstance()
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
 
         val view = inflater.inflate(R.layout.fragment_profile, container, false)
+
 
         // Leer los datos del perfil desde SharedPreferences
         val sharedPrefs = context?.getSharedPreferences("UserProfile", Context.MODE_PRIVATE)
@@ -45,6 +49,14 @@ class ProfileFragment : Fragment() {
             openMyProducts()
         }
 
+        // Obtener una referencia al botón "Cerrar Sesión"
+        val btnLogout = view.findViewById<Button>(R.id.btnLogout)
+
+        // Agregar el listener de clic al botón "Cerrar Sesión"
+        btnLogout.setOnClickListener {
+            signOut()
+        }
+
         return view
     }
 
@@ -62,12 +74,22 @@ class ProfileFragment : Fragment() {
 
     private fun openMyProducts() {
         // Obtener el ID del usuario actual
-        val currentUser = FirebaseAuth.getInstance().currentUser
+        val currentUser = auth.currentUser
         val userId = currentUser?.uid
 
         // Crear el intent para abrir la actividad "ProductListActivity" con el ID del usuario actual
         val intent = Intent(context, ProductListActivity::class.java)
         intent.putExtra("userId", userId)
         startActivity(intent)
+    }
+
+    private fun signOut() {
+        auth.signOut()
+
+        // Redirigir al usuario a la pantalla de inicio de sesión
+        val intent = Intent(activity, LoginActivity::class.java)
+        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+        startActivity(intent)
+        activity?.finish()
     }
 }

@@ -98,9 +98,10 @@ class NewProductActivity : AppCompatActivity() {
             Toast.makeText(this, "Seleccione una imagen", Toast.LENGTH_SHORT).show()
             return
         }
-
+        val productId = UUID.randomUUID().toString()
         // Crear un objeto Producto con los datos ingresados
         val product = Product(
+            id = productId,
             title = title,
             price = price.toDouble(),
             phoneNumber = phoneNumber,

@@ -43,6 +43,8 @@ class LoginActivity : AppCompatActivity() {
             }
 
             // Iniciar sesión con Firebase Authentication
+        val currentUser = FirebaseAuth.getInstance().currentUser
+        if (currentUser != null){
             FirebaseAuth.getInstance().signInWithEmailAndPassword(email, password)
                 .addOnCompleteListener { task ->
                     if (task.isSuccessful) {
@@ -50,7 +52,6 @@ class LoginActivity : AppCompatActivity() {
                         Toast.makeText(this, "Inicio de sesión exitoso", Toast.LENGTH_SHORT).show()
 
                         val intent = Intent(this, MainActivity::class.java)
-                        intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK
                         startActivity(intent)
                         finish()
                     } else {
@@ -63,4 +64,6 @@ class LoginActivity : AppCompatActivity() {
                     }
                 }
         }
+    }
+
 }
