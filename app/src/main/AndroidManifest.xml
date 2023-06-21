@@ -2,6 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"
+        android:maxSdkVersion="32" />
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -17,6 +19,9 @@
             android:exported="false" />
         <activity
             android:name=".services.MainActivity"
+            android:exported="false" />
+        <activity
+            android:name="com.example.proyecto.services.NewProductActivity"
             android:exported="false" />
         <activity
             android:name=".services.LoginActivity"

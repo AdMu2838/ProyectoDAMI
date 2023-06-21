@@ -1,5 +1,6 @@
 package com.example.proyecto.fragments
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -10,10 +11,13 @@ import androidx.fragment.app.Fragment
 import com.example.proyecto.R
 import com.example.proyecto.adapters.CategoryAdapter
 import com.example.proyecto.core.Categoria
+import com.example.proyecto.services.NewProductActivity
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 
 class HomeFragment : Fragment() {
     private lateinit var categoryGridView: GridView
     private lateinit var categoryAdapter: CategoryAdapter
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -30,6 +34,12 @@ class HomeFragment : Fragment() {
         // Asignar el adaptador al GridView
         categoryGridView.adapter = categoryAdapter
 
+        // Configurar el botón de agregar
+        val addButton: FloatingActionButton = view.findViewById(R.id.addButton)
+        addButton.setOnClickListener {
+            val intent = Intent(requireContext(), NewProductActivity::class.java)
+            startActivity(intent)
+        }
 
         return view
     }
