@@ -9,7 +9,7 @@
     <string name="password_hint">Contraseña</string>
     <string name="login">Iniciar sesión</string>
     <string name="user_image">Imagen de usuario</string>
-    <string name="register">REGISTER</string>
+    <string name="register">REGISTRATE</string>
     <string name="login_email_hint">Email</string>
     <string name="login_password_hint">Password</string>
     <string name="add">Agregar</string>
