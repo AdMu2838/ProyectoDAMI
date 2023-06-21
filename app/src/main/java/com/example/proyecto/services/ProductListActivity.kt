@@ -25,16 +25,25 @@ class ProductListActivity : AppCompatActivity() {
         setContentView(R.layout.activity_product_list)
 
         val categoryName = intent.getStringExtra("categoryName")
+        val userId = intent.getStringExtra("userId") // Obtener el userId de los parámetros
+
         // Configurar el GridView de productos
         productGridView = findViewById(R.id.gridView_products)
         productAdapter = ProductAdapter(this, products)
         productGridView.adapter = productAdapter
 
-        // Obtener los productos de la categoría seleccionada
+        // Obtener los productos de la categoría seleccionada y del usuario si se proporciona el userId
         val firestore = FirebaseFirestore.getInstance()
-        val query = firestore.collection("products")
-            .whereEqualTo("category", categoryName)
-            .orderBy("title", Query.Direction.ASCENDING)
+        var query: Query = firestore.collection("products")
+
+        if (userId != null) {
+            query = query.whereEqualTo("userId", userId)
+        } else if (categoryName != null) {
+            query = query.whereEqualTo("category", categoryName)
+        }
+
+
+
 
         query.addSnapshotListener { snapshot, exception ->
             if (exception != null) {
@@ -45,7 +54,7 @@ class ProductListActivity : AppCompatActivity() {
             }
 
             // Limpiar la lista de productos
-
+            products.clear()
 
             if (snapshot != null) {
                 Log.d(TAG, "Número de documentos recuperados: ${snapshot.documents.size}")
@@ -70,13 +79,14 @@ class ProductListActivity : AppCompatActivity() {
         // Ocultar el GridView si no hay productos
         //productGridView.visibility = if (products.isEmpty()) View.GONE else View.VISIBLE
     }
+
     private fun showProductDetails(product: Product) {
         val dialogBuilder = AlertDialog.Builder(this)
         dialogBuilder.setTitle("Detalles del producto")
         dialogBuilder.setMessage("Nombre: ${product.title}\n" +
                 "Precio: ${product.price}\n" +
-                "Descripción: ${product.description}\n"+
-                "Numero de contacto:  ${product.phoneNumber}")
+                "Descripción: ${product.description}\n" +
+                "Número de contacto: ${product.phoneNumber}")
         dialogBuilder.setPositiveButton("Cerrar", null)
         val dialog = dialogBuilder.create()
         dialog.show()

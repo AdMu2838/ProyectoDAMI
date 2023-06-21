@@ -18,6 +18,8 @@ class LoginActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
         databaseHelper = DatabaseHelper(this)
+        // Habilitar la persistencia de la sesión en Firebase Authentication
+
         val btnRegister = findViewById<Button>(R.id.btnRegistro)
         btnRegister.setOnClickListener {
             val intent = Intent(this, RegisterActivity::class.java)
@@ -51,7 +53,9 @@ class LoginActivity : AppCompatActivity() {
                         Toast.makeText(this, "Inicio de sesión exitoso", Toast.LENGTH_SHORT).show()
 
                         val intent = Intent(this, MainActivity::class.java)
+                        intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK
                         startActivity(intent)
+                        finish()
                     } else {
                         // Ocurrió un error durante el inicio de sesión
                         Toast.makeText(

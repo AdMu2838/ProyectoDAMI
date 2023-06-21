@@ -2,15 +2,18 @@ package com.example.proyecto.fragments
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.example.proyecto.R
+import com.example.proyecto.services.ProductListActivity
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 
@@ -34,8 +37,17 @@ class ProfileFragment : Fragment() {
         // Actualizar la interfaz de usuario con los datos del perfil
         updateProfileUI(view, name, email, date, phoneNumber)
 
+        // Obtener una referencia al botón "Mis Productos"
+        val btnMyProducts = view.findViewById<Button>(R.id.btnMyProducts)
+
+        // Agregar el listener de clic al botón "Mis Productos"
+        btnMyProducts.setOnClickListener {
+            openMyProducts()
+        }
+
         return view
     }
+
     private fun updateProfileUI(view: View?, name: String?, email: String?, date: String?, phoneNumber: String?) {
         val nameTextView = view?.findViewById<TextView>(R.id.nameTextView)
         val emailTextView = view?.findViewById<TextView>(R.id.emailTextView)
@@ -46,5 +58,16 @@ class ProfileFragment : Fragment() {
         emailTextView?.text = email
         dateTextView?.text = date
         phoneNumberTextView?.text = phoneNumber
+    }
+
+    private fun openMyProducts() {
+        // Obtener el ID del usuario actual
+        val currentUser = FirebaseAuth.getInstance().currentUser
+        val userId = currentUser?.uid
+
+        // Crear el intent para abrir la actividad "ProductListActivity" con el ID del usuario actual
+        val intent = Intent(context, ProductListActivity::class.java)
+        intent.putExtra("userId", userId)
+        startActivity(intent)
     }
 }
