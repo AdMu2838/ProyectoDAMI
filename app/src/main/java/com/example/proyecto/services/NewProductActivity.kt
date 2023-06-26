@@ -94,8 +94,10 @@ class NewProductActivity : AppCompatActivity() {
 
         btnTakePhoto.setOnClickListener {
             // Verificar si se tienen los permisos necesarios para acceder a la cámara
-            if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-                ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE), 3)
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED&&
+                ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.CAMERA), 3)
+                ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.CAMERA), 4)
             } else {
                 // Abrir la cámara para tomar una foto
                 dispatchTakePictureIntent()
@@ -105,9 +107,11 @@ class NewProductActivity : AppCompatActivity() {
 
     private fun dispatchTakePictureIntent() {
         Intent(MediaStore.ACTION_IMAGE_CAPTURE).also { takePictureIntent ->
-            takePictureIntent.resolveActivity(packageManager)?.also {
+            takePictureIntent.resolveActivity(packageManager).also {
+                //Toast.makeText(this,"Tomando foto", Toast.LENGTH_SHORT).show()
                 startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE)
-            } ?: Toast.makeText(this, "No se encontró una aplicación de cámara", Toast.LENGTH_SHORT).show()
+            } ?:
+            Toast.makeText(this, "No se encontró una aplicación de cámara", Toast.LENGTH_SHORT).show()
         }
     }
 
