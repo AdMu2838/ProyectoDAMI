@@ -9,10 +9,10 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.proyecto.R
 import com.example.proyecto.core.Chat
 
-class ChatAdapter(val chatClick: (Chat) -> Unit): RecyclerView.Adapter<ChatAdapter.ChatViewHolder>() {
+class ChatAdapter(val chatClick: (Chat) -> Unit) : RecyclerView.Adapter<ChatAdapter.ChatViewHolder>() {
     var chats: List<Chat> = emptyList()
 
-    fun setData(list: List<Chat>){
+    fun setData(list: List<Chat>) {
         chats = list
         notifyDataSetChanged()
     }
@@ -28,23 +28,30 @@ class ChatAdapter(val chatClick: (Chat) -> Unit): RecyclerView.Adapter<ChatAdapt
     }
 
     override fun onBindViewHolder(holder: ChatViewHolder, position: Int) {
-
         val currentChat = chats[position]
 
-        holder.chatNameText.text = currentChat.name
-        holder.usersTextView.text = currentChat.users.joinToString(", ")
-
-        holder.itemView.setOnClickListener {
-            chatClick(currentChat)
-        }
+        holder.bind(currentChat)
     }
 
     override fun getItemCount(): Int {
         return chats.size
     }
 
-    class ChatViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val chatNameText: TextView = itemView.findViewById(R.id.chatNameText)
-        val usersTextView: TextView = itemView.findViewById(R.id.usersTextView)
+    fun getItem(position: Int): Chat {
+        return chats[position]
+    }
+
+    inner class ChatViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        private val chatNameText: TextView = itemView.findViewById(R.id.chatNameText)
+        private val usersTextView: TextView = itemView.findViewById(R.id.usersTextView)
+
+        fun bind(chat: Chat) {
+            chatNameText.text = chat.name
+            usersTextView.text = chat.users.joinToString(", ")
+
+            itemView.setOnClickListener {
+                chatClick(chat)
+            }
+        }
     }
 }

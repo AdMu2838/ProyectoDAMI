@@ -3,16 +3,16 @@ package com.example.proyecto.adapters
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.proyecto.R
 import com.example.proyecto.core.Message
 
-class MessageAdapter(private val user: String): RecyclerView.Adapter<MessageAdapter.MessageViewHolder>() {
-
+class MessageAdapter(private val user: String) : RecyclerView.Adapter<MessageAdapter.MessageViewHolder>() {
     private var messages: List<Message> = emptyList()
 
-    fun setData(list: List<Message>){
+    fun setData(list: List<Message>) {
         messages = list
         notifyDataSetChanged()
     }
@@ -30,23 +30,29 @@ class MessageAdapter(private val user: String): RecyclerView.Adapter<MessageAdap
     override fun onBindViewHolder(holder: MessageViewHolder, position: Int) {
         val message = messages[position]
 
-        if(user == message.from){
-            holder.itemView.findViewById<View>(R.id.myMessageLayout).visibility = View.VISIBLE
-            holder.itemView.findViewById<View>(R.id.otherMessageLayout).visibility = View.GONE
+        if (user == message.from) {
+            holder.myMessageLayout.visibility = View.VISIBLE
+            holder.otherMessageLayout.visibility = View.GONE
 
-            holder.itemView.findViewById<TextView>(R.id.myMessageTextView).text = message.message
+            holder.myMessageTextView.text = message.message
+            holder.othersMessageTextView.text = "" // Para asegurarse de que el otro mensaje esté vacío
         } else {
-            holder.itemView.findViewById<View>(R.id.myMessageLayout).visibility = View.GONE
-            holder.itemView.findViewById<View>(R.id.otherMessageLayout).visibility = View.VISIBLE
+            holder.myMessageLayout.visibility = View.GONE
+            holder.otherMessageLayout.visibility = View.VISIBLE
 
-            holder.itemView.findViewById<TextView>(R.id.othersMessageTextView).text = message.message
+            holder.myMessageTextView.text = "" // Para asegurarse de que el mensaje propio esté vacío
+            holder.othersMessageTextView.text = message.message
         }
-
     }
 
     override fun getItemCount(): Int {
         return messages.size
     }
 
-    class MessageViewHolder(itemView: View): RecyclerView.ViewHolder(itemView)
+    inner class MessageViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        val myMessageLayout: LinearLayout = itemView.findViewById(R.id.myMessageLayout)
+        val otherMessageLayout: LinearLayout = itemView.findViewById(R.id.otherMessageLayout)
+        val myMessageTextView: TextView = itemView.findViewById(R.id.myMessageTextView)
+        val othersMessageTextView: TextView = itemView.findViewById(R.id.othersMessageTextView)
+    }
 }
