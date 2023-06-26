@@ -1,6 +1,7 @@
 package com.example.proyecto.services
 
 import android.content.ContentValues.TAG
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
@@ -90,8 +91,15 @@ class ProductListActivity : AppCompatActivity() {
         val currentUser = FirebaseAuth.getInstance().currentUser
         val userId = currentUser?.uid
 
+        val showChatButton = userId != null && userId != product.userId
+
+        if (showChatButton) {
+            dialogBuilder.setNeutralButton("Chat") { _, _ ->
+                startChatWithProductOwner(product)
+            }
+        }
+
         if (userId == product.userId) {
-            // El usuario actual tiene el mismo userId que el producto, se puede mostrar el botón "Eliminar"
             dialogBuilder.setNegativeButton("Eliminar") { _, _ ->
                 deleteProduct(product)
             }
@@ -99,6 +107,13 @@ class ProductListActivity : AppCompatActivity() {
 
         val dialog = dialogBuilder.create()
         dialog.show()
+    }
+
+    private fun startChatWithProductOwner(product: Product) {
+        val intent = Intent(this, ChatActivity::class.java)
+        intent.putExtra("productId", product.id)
+        intent.putExtra("productOwner", product.userId)
+        startActivity(intent)
     }
 
     private fun deleteProduct(product: Product) {

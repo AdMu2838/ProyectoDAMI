@@ -26,18 +26,24 @@ class ChatActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_chat)
 
-        intent.getStringExtra("chatId")?.let { chatId = it }
-        intent.getStringExtra("user")?.let { user = it }
+        chatId = intent.getStringExtra("chatId") ?: ""
+        user = intent.getStringExtra("user") ?: ""
 
-        if(chatId.isNotEmpty() && user.isNotEmpty()) {
+        if (chatId.isNotEmpty() && user.isNotEmpty()) {
+            initAdapter()
             initViews()
         }
     }
-
-    private fun initViews(){
-        val messagesRecyclerView: RecyclerView = findViewById(R.id.messagesRecylerView)
+    private fun initAdapter() {
+        val messageAdapter = MessageAdapter(user)
+        val messagesRecyclerView: RecyclerView = findViewById(R.id.messagesRecyclerView)
+        messagesRecyclerView.adapter = messageAdapter
+    }
+    private fun initViews() {
+        val messagesRecyclerView: RecyclerView = findViewById(R.id.messagesRecyclerView)
         messagesRecyclerView.layoutManager = LinearLayoutManager(this)
-        messagesRecyclerView.adapter = MessageAdapter(user)
+        val messageAdapter = MessageAdapter(user)
+        messagesRecyclerView.adapter = messageAdapter
 
         val messageTextField: EditText = findViewById(R.id.messageTextField)
         val sendMessageButton: Button = findViewById(R.id.sendMessageButton)
@@ -49,7 +55,7 @@ class ChatActivity : AppCompatActivity() {
             .get()
             .addOnSuccessListener { messages ->
                 val listMessages = messages.toObjects(Message::class.java)
-                (messagesRecyclerView.adapter as MessageAdapter).setData(listMessages)
+                messageAdapter.setData(listMessages)
             }
 
         chatRef.collection("messages").orderBy("dob", Query.Direction.ASCENDING)
@@ -57,13 +63,13 @@ class ChatActivity : AppCompatActivity() {
                 if (error == null) {
                     messages?.let {
                         val listMessages = it.toObjects(Message::class.java)
-                        (messagesRecyclerView.adapter as MessageAdapter).setData(listMessages)
+                        messageAdapter.setData(listMessages)
                     }
                 }
             }
     }
 
-    private fun sendMessage(){
+    private fun sendMessage() {
         val messageTextField: EditText = findViewById(R.id.messageTextField)
         val message = Message(
             message = messageTextField.text.toString(),
@@ -73,7 +79,5 @@ class ChatActivity : AppCompatActivity() {
         db.collection("chats").document(chatId).collection("messages").document().set(message)
 
         messageTextField.setText("")
-
-
     }
 }
