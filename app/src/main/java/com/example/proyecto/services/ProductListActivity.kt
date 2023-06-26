@@ -6,9 +6,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.view.View
-import android.widget.AdapterView
-import android.widget.GridView
-import android.widget.Toast
+import android.widget.*
 import androidx.appcompat.app.AlertDialog
 import com.example.proyecto.R
 import com.example.proyecto.adapters.ProductAdapter
@@ -103,7 +101,104 @@ class ProductListActivity : AppCompatActivity() {
             dialogBuilder.setNegativeButton("Eliminar") { _, _ ->
                 deleteProduct(product)
             }
+
+            dialogBuilder.setNeutralButton("Editar") { _, _ ->
+                editProduct(product)
+            }
         }
+
+        val dialog = dialogBuilder.create()
+        dialog.show()
+    }
+
+    private fun editProduct(product: Product) {
+        val dialogBuilder = AlertDialog.Builder(this)
+        dialogBuilder.setTitle("Editar producto")
+
+        val dialogView = layoutInflater.inflate(R.layout.dialog_edit_product, null)
+        dialogBuilder.setView(dialogView)
+
+        val titleEditText: EditText = dialogView.findViewById(R.id.editText_title)
+        val priceEditText: EditText = dialogView.findViewById(R.id.editText_price)
+        val descriptionEditText: EditText = dialogView.findViewById(R.id.editText_description)
+        val contactEditText: EditText = dialogView.findViewById(R.id.editText_contact)
+        val spinnerCategory: Spinner = dialogView.findViewById(R.id.spinnerCategory)
+        val categoryArray = resources.getStringArray(R.array.category_array)
+
+        val initialCategoryIndex = categoryArray.indexOf(product.category)
+        spinnerCategory.setSelection(initialCategoryIndex)
+
+        spinnerCategory.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                // Retrieve the selected category and update the product object
+                val selectedCategory = categoryArray[position]
+                product.category = selectedCategory
+            }
+
+            override fun onNothingSelected(parent: AdapterView<*>?) {
+                // Handle the case when no category is selected
+            }
+        }
+
+        // Mostrar los detalles actuales del producto en los campos de edición
+        titleEditText.setText(product.title)
+        priceEditText.setText(product.price.toString())
+        descriptionEditText.setText(product.description)
+        contactEditText.setText(product.phoneNumber)
+
+        dialogBuilder.setPositiveButton("Guardar") { _, _ ->
+            // Obtener los nuevos valores del producto editado
+            val newTitle = titleEditText.text.toString()
+            val newPrice = priceEditText.text.toString().toDoubleOrNull()
+            val newDescription = descriptionEditText.text.toString()
+            val newContact = contactEditText.text.toString()
+
+            val firestore = FirebaseFirestore.getInstance()
+
+            // Realiza una consulta para obtener el documento con el campo product.id
+            firestore.collection("products")
+                .whereEqualTo("id", product.id)
+                .get()
+                .addOnSuccessListener { querySnapshot ->
+                    for (document in querySnapshot.documents) {
+                        // Actualizar los detalles del producto en la lista local
+                        product.title = newTitle
+                        if (newPrice != null) {
+                            product.price = newPrice
+                        }
+                        product.description = newDescription
+                        product.phoneNumber = newContact
+
+                        // Actualizar los detalles del producto en Firebase Firestore
+                        val productRef = firestore.collection("products").document(document.id)
+                        val updatedData = mapOf(
+                            "title" to newTitle,
+                            "price" to newPrice,
+                            "description" to newDescription,
+                            "phoneNumber" to newContact,
+                            "category" to product.category
+                        )
+                        productRef.update(updatedData)
+                            .addOnSuccessListener {
+                                // Actualización exitosa en Firebase
+                                // Notificar al adaptador que los datos han cambiado
+                                productAdapter.notifyDataSetChanged()
+                            }
+                            .addOnFailureListener { exception ->
+                                // Error al actualizar el producto en Firebase
+                                Toast.makeText(this, "Error al actualizar el producto: ${exception.message}", Toast.LENGTH_SHORT).show()
+                                Log.e(TAG, "Error al actualizar el producto", exception)
+                            }
+                    }
+                }
+                .addOnFailureListener { exception ->
+                    // Error al obtener el documento en Firebase
+                    Toast.makeText(this, "Error al obtener el producto: ${exception.message}", Toast.LENGTH_SHORT).show()
+                    Log.e(TAG, "Error al obtener el producto", exception)
+                }
+        }
+
+        dialogBuilder.setNegativeButton("Cancelar", null)
 
         val dialog = dialogBuilder.create()
         dialog.show()
@@ -145,6 +240,8 @@ class ProductListActivity : AppCompatActivity() {
                 Log.e(TAG, "Error al obtener el producto", exception)
             }
     }
+
+
 
     companion object {
         private const val TAG = "ProductListActivity"

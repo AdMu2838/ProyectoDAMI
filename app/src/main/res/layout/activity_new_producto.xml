@@ -49,6 +49,14 @@
         android:text="Subir Foto" />
 
     <Button
+        android:id="@+id/btnTakePhoto"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/btnUploadPhoto"
+        android:layout_centerHorizontal="true"
+        android:text="Tomar Foto" />
+
+    <Button
         android:id="@+id/btnSave"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

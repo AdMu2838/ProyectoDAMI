@@ -18,6 +18,14 @@ import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.ktx.storage
 import java.util.UUID
+import android.Manifest
+import android.content.pm.PackageManager
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.os.Build
+import android.provider.MediaStore
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 
 class NewProductActivity : AppCompatActivity() {
     private lateinit var etTitle: EditText
@@ -27,12 +35,15 @@ class NewProductActivity : AppCompatActivity() {
     private lateinit var spinnerCategory: Spinner
     private lateinit var btnSave: Button
     private lateinit var btnUploadPhoto: Button
+    private lateinit var btnTakePhoto: Button
 
     private val categories = listOf("Accesorios", "Ropa", "Juguetes")
     private lateinit var selectedCategory: String
 
     // Constante para identificar el código de solicitud para seleccionar una imagen
     private val PICK_IMAGE_REQUEST = 1
+
+    private val REQUEST_IMAGE_CAPTURE = 2
 
     // Uri de la imagen seleccionada
     private var imageUri: Uri? = null
@@ -54,6 +65,7 @@ class NewProductActivity : AppCompatActivity() {
         spinnerCategory = findViewById(R.id.spinnerCategory)
         btnSave = findViewById(R.id.btnSave)
         btnUploadPhoto = findViewById(R.id.btnUploadPhoto)
+        btnTakePhoto = findViewById(R.id.btnTakePhoto)
 
         val categoryAdapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, categories)
         categoryAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
@@ -79,8 +91,49 @@ class NewProductActivity : AppCompatActivity() {
             intent.type = "image/*"
             startActivityForResult(intent, PICK_IMAGE_REQUEST)
         }
+
+        btnTakePhoto.setOnClickListener {
+            // Verificar si se tienen los permisos necesarios para acceder a la cámara
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED&&
+                ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.CAMERA), 3)
+                ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.CAMERA), 4)
+            } else {
+                // Abrir la cámara para tomar una foto
+                dispatchTakePictureIntent()
+            }
+        }
     }
 
+    private fun dispatchTakePictureIntent() {
+        Intent(MediaStore.ACTION_IMAGE_CAPTURE).also { takePictureIntent ->
+            takePictureIntent.resolveActivity(packageManager).also {
+                //Toast.makeText(this,"Tomando foto", Toast.LENGTH_SHORT).show()
+                startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE)
+            } ?:
+            Toast.makeText(this, "No se encontró una aplicación de cámara", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun saveImageToGallery(bitmap: Bitmap) {
+        val savedImageURL = MediaStore.Images.Media.insertImage(
+            contentResolver,
+            bitmap,
+            "Product Image",
+            "Product Image"
+        )
+        imageUri = Uri.parse(savedImageURL)
+    }
+
+    private fun handleImageCaptureResult(data: Intent?) {
+        val imageBitmap = data?.extras?.get("data") as? Bitmap
+        if (imageBitmap != null) {
+            // Guardar la imagen capturada en la galería
+            saveImageToGallery(imageBitmap)
+        } else {
+            Toast.makeText(this, "No se pudo obtener la imagen capturada", Toast.LENGTH_SHORT).show()
+        }
+    }
     private fun saveProduct() {
         val title = etTitle.text.toString()
         val price = etPrice.text.toString()
@@ -141,6 +194,17 @@ class NewProductActivity : AppCompatActivity() {
             }
     }
 
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode == 3) {
+            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                // Permiso concedido, puedes proceder a acceder a la cámara y guardar la imagen
+            } else {
+                // Permiso denegado, muestra un mensaje al usuario o toma alguna otra acción
+            }
+        }
+    }
+
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 
@@ -149,6 +213,10 @@ class NewProductActivity : AppCompatActivity() {
             imageUri = data.data
             // Mostrar la imagen seleccionada en un ImageView (opcional)
             //imageView.setImageURI(imageUri)
+        } else if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK && data != null) {
+            // Captura de foto exitosa, manejar la imagen capturada
+            handleImageCaptureResult(data)
         }
     }
 }
+
